@@ -2,6 +2,9 @@ import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from models import User, Game, Review, Base
+from lib.models import User, Game, Review
+
+
 
 # Create an in-memory SQLite database for testing
 SQLITE_URL = "sqlite:///:memory:"
