@@ -1,34 +1,18 @@
-import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from models import User, Game, Review, Base
-from lib.models import User, Game, Review
 
-
-
-# Create an in-memory SQLite database for testing
-SQLITE_URL = "sqlite:///:memory:"
-
-# Create the database engine and bind it to the session
-engine = create_engine(SQLITE_URL)
-Base.metadata.create_all(engine)
-Session = sessionmaker(bind=engine)
-
-
-@pytest.fixture
-def session():
-    """Create a new database session for each test."""
-    session = Session()
-    yield session
-    session.rollback()
-    session.close()
-
+from conftest import SQLITE_URL
+from models import User, Game, Review
 
 class TestUser:
-    """User in models.py"""
+    '''User in models.py'''
 
-    def test_has_attributes(self, session):
-        """has attributes id, name, created_at, updated_at, reviews, and games."""
+    def test_has_attributes(self):
+        '''has attributes id, name, created_at, updated_at, reviews, and games.'''
+        
+        engine = create_engine(SQLITE_URL)
+        Session = sessionmaker(bind=engine)
+        session = Session()
 
         user = User(name="Ben")
         session.add(user)
@@ -44,8 +28,12 @@ class TestUser:
         session.query(User).delete()
         session.commit()
 
-    def test_has_many_reviews(self, session):
-        """has an attribute "reviews" that is a sequence of Review records."""
+    def test_has_many_reviews(self):
+        '''has an attribute "reviews" that is a sequence of Review records.'''
+
+        engine = create_engine(SQLITE_URL)
+        Session = sessionmaker(bind=engine)
+        session = Session()
 
         review_1 = Review(score=8, comment="Good game!")
         review_2 = Review(score=6, comment="OK game.")
@@ -66,8 +54,12 @@ class TestUser:
         session.query(User).delete()
         session.commit()
 
-    def test_has_many_games(self, session):
-        """has an attribute "games" that is a sequence of Game records."""
+    def test_has_many_games(self):
+        '''has an attribute "games" that is a sequence of Game records.'''
+
+        engine = create_engine(SQLITE_URL)
+        Session = sessionmaker(bind=engine)
+        session = Session()
 
         game_1 = Game(title="Super Marvin Sunscreen")
         game_2 = Game(title="The Legend of Zumba: Breath of the Indoors")
@@ -75,6 +67,8 @@ class TestUser:
         session.commit()
 
         user = User(name="Ben")
+
+        print(user.games)
         user.games.append(game_1)
         user.games.append(game_2)
         session.add(user)
@@ -87,3 +81,4 @@ class TestUser:
         session.query(Game).delete()
         session.query(User).delete()
         session.commit()
+        
