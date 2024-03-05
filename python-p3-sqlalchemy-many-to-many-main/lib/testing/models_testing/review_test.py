@@ -1,18 +1,31 @@
+import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from models import User, Game, Review, Base
 
-from conftest import SQLITE_URL
-from models import User, Game, Review
+# Create an in-memory SQLite database for testing
+SQLITE_URL = "sqlite:///:memory:"
+
+# Create the database engine and bind it to the session
+engine = create_engine(SQLITE_URL)
+Base.metadata.create_all(engine)
+Session = sessionmaker(bind=engine)
+
+
+@pytest.fixture
+def session():
+    """Create a new database session for each test."""
+    session = Session()
+    yield session
+    session.rollback()
+    session.close()
+
 
 class TestReview:
-    '''Review in models.py'''
+    """Review in models.py"""
 
-    def test_has_attributes(self):
-        '''has attributes id, score, comment, game_id, and user_id.'''
-        
-        engine = create_engine(SQLITE_URL)
-        Session = sessionmaker(bind=engine)
-        session = Session()
+    def test_has_attributes(self, session):
+        """has attributes id, score, comment, game_id, and user_id."""
 
         review = Review(score=2, comment="Very bad!")
         session.add(review)
@@ -27,12 +40,8 @@ class TestReview:
         session.query(Review).delete()
         session.commit()
 
-    def test_has_one_user_id(self):
-        '''has an attribute "user_id", an int that is a foreign key to the users table.'''
-
-        engine = create_engine(SQLITE_URL)
-        Session = sessionmaker(bind=engine)
-        session = Session()
+    def test_has_one_user_id(self, session):
+        """has an attribute "user_id", an int that is a foreign key to the users table."""
 
         user = User(name="Ben")
         session.add(user)
@@ -50,12 +59,8 @@ class TestReview:
         session.query(Review).delete()
         session.commit()
 
-    def test_has_one_user(self):
-        '''has an attribute "user" in the ORM that is a record from the users table.'''
-
-        engine = create_engine(SQLITE_URL)
-        Session = sessionmaker(bind=engine)
-        session = Session()
+    def test_has_one_user(self, session):
+        """has an attribute "user" in the ORM that is a record from the users table."""
 
         user = User(name="Ben")
         session.add(user)
@@ -74,12 +79,8 @@ class TestReview:
         session.query(Review).delete()
         session.commit()
 
-    def test_has_one_game_id(self):
-        '''has an attribute "game_id", an int that is a foreign key to the games table.'''
-
-        engine = create_engine(SQLITE_URL)
-        Session = sessionmaker(bind=engine)
-        session = Session()
+    def test_has_one_game_id(self, session):
+        """has an attribute "game_id", an int that is a foreign key to the games table."""
 
         game = Game(title="Javelinna")
         session.add(game)
@@ -97,12 +98,8 @@ class TestReview:
         session.query(Review).delete()
         session.commit()
 
-    def test_has_one_game(self):
-        '''has an attribute "game" in the ORM that is a record from the games table.'''
-
-        engine = create_engine(SQLITE_URL)
-        Session = sessionmaker(bind=engine)
-        session = Session()
+    def test_has_one_game(self, session):
+        """has an attribute "game" in the ORM that is a record from the games table."""
 
         game = Game(title="Shady Spirits")
         session.add(game)

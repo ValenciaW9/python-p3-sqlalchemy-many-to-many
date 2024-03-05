@@ -1,10 +1,8 @@
-
-
 import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from models import Base, Game, Review
+from models import User, Game, Review, Base
 
 # Create an in-memory SQLite database for testing
 SQLITE_URL = "sqlite:///:memory:"
